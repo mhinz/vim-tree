@@ -3,6 +3,7 @@ let s:default_chars = '[^│─├└  ]'
 
 function! tree#Tree(options) abort
   enew
+  let s:last_options = a:options
   execute 'silent %!'.get(g:, 'tree_cmd', s:default_cmd).' '.a:options
   silent! %substitute/ / /g
   2
@@ -12,6 +13,9 @@ function! tree#Tree(options) abort
   augroup tree
     autocmd!
     autocmd CursorMoved <buffer> call s:on_cursormoved()
+    if exists('#DirChanged')
+      autocmd DirChanged <buffer> call tree#Tree(s:last_options)
+    endif
   augroup END
   echo '(q)uit (e)dit (s)plit (v)split (t)abedit'
   set filetype=tree
