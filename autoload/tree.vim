@@ -11,7 +11,7 @@ function! tree#Tree(options) abort
   enew
   let &l:statusline = ' '.cmd
   execute 'silent %!'.cmd
-  if v:shell_error || getline('1') != '.'
+  if v:shell_error || !isdirectory(getline('1'))
     redraw!
     echohl WarningMsg | echo 'Press any button to close this buffer' | echohl NONE
     call getchar()
@@ -30,20 +30,21 @@ function! tree#Tree(options) abort
       autocmd DirChanged <buffer> call tree#Tree(s:last_options)
     endif
   augroup END
-  echo '(q)uit (e)dit (s)plit (v)split (t)abedit'
+  echo '(q)uit (c)d (e)dit (s)plit (v)split (t)abedit'
   set filetype=tree
 endfunction
 
 function! s:set_mappings() abort
-  nnoremap <silent><buffer> q :bwipeout \| echo<cr>
-  nnoremap <silent><buffer> e :execute 'edit'    tree#GetPath()<cr>
-  nnoremap <silent><buffer> s :execute 'split'   tree#GetPath()<cr>
-  nnoremap <silent><buffer> v :execute 'vsplit'  tree#GetPath()<cr>
-  nnoremap <silent><buffer> t :execute 'tabedit' tree#GetPath()<cr>
-  nnoremap <silent><buffer> h :call tree#go_back()<cr>
-  nnoremap <silent><buffer> l :call tree#go_forth()<cr>
-  nnoremap <silent><buffer> K :call tree#go_up()<cr>
-  nnoremap <silent><buffer> J :call tree#go_down()<cr>
+  nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
+  nnoremap <silent><buffer><nowait> c :execute 'lcd'     tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> e :execute 'edit'    tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> s :execute 'split'   tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> v :execute 'vsplit'  tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> t :execute 'tabedit' tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> h :call tree#go_back()<cr>
+  nnoremap <silent><buffer><nowait> l :call tree#go_forth()<cr>
+  nnoremap <silent><buffer><nowait> K :call tree#go_up()<cr>
+  nnoremap <silent><buffer><nowait> J :call tree#go_down()<cr>
 endfunction
 
 function! tree#go_up() abort
@@ -102,7 +103,7 @@ function! tree#GetPath() abort
   while line > 1
     let c = match(getline(line), s:default_chars)
     if c < col
-      let part = matchstr(getline(line)[c:], '.*') . path
+      let part = matchstr(getline(line)[c:], '.*')
       " handle symlinks
       let part = substitute(part, ' ->.*', '', '')
       let path = part . path
