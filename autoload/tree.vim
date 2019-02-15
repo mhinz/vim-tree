@@ -102,7 +102,10 @@ function! tree#GetPath() abort
   while line > 1
     let c = match(getline(line), s:default_chars)
     if c < col
-      let path = matchstr(getline(line)[c:], '.*') . path
+      let part = matchstr(getline(line)[c:], '.*') . path
+      " handle symlinks
+      let part = substitute(part, ' ->.*', '', '')
+      let path = part . path
       let col = c
     endif
     let line -= 1
