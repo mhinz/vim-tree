@@ -6,12 +6,21 @@ function! tree#Tree(options) abort
   execute 'silent %!'.get(g:, 'tree_cmd', s:default_cmd).' '.a:options
   setlocal nomodified buftype=nofile bufhidden=wipe
   let &l:statusline = ' tree '.getcwd()
-  nnoremap q :silent bwipeout<cr>
+  call s:set_mappings()
   augroup tree
     autocmd!
     autocmd CursorMoved <buffer> call s:on_cursormoved()
   augroup END
+  echo '(q)uit (e)dit (s)plit (v)split (t)abedit'
   set filetype=tree
+endfunction
+
+function! s:set_mappings() abort
+  nnoremap <silent> q :bwipeout<cr>
+  nnoremap <silent> e :execute 'edit'    tree#GetPath()<cr>
+  nnoremap <silent> s :execute 'split'   tree#GetPath()<cr>
+  nnoremap <silent> v :execute 'vsplit'  tree#GetPath()<cr>
+  nnoremap <silent> t :execute 'tabedit' tree#GetPath()<cr>
 endfunction
 
 function! s:get_name(...) abort
