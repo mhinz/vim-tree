@@ -1,9 +1,11 @@
-let s:default_cmd   = 'tree -c -F --dirsfirst --noreport'
-let s:default_chars = '[^│─├└  ]'
+scriptencoding utf-8
+
+let s:default_cmd = 'tree -c -F --dirsfirst --noreport'
+let s:regex_name = ' \zs[^`|-│─├└  ]'
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
-  let cmd = s:default_cmd.' '.a:options
+  let cmd = s:default_cmd.' '.a:options.' '.getcwd()
   if !&hidden && &modified
     echohl WarningMsg | echo 'There are unsaved changes.' | echohl NONE
     return
@@ -31,7 +33,9 @@ function! tree#Tree(options) abort
     endif
   augroup END
   echo '(q)uit (c)d (e)dit (s)plit (v)split (t)abedit'
+  highlight default link TreeDirectory Directory
   set filetype=tree
+  syntax match TreeDirectory /[^│─├└  ]*\ze\/$/
 endfunction
 
 function! s:set_mappings() abort
@@ -50,7 +54,7 @@ endfunction
 function! tree#go_up() abort
   let [line, col] = [line('.')-1, virtcol('.')-1]
   while line > 1
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:default_chars))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
     if c == col
       execute line
       return 1
@@ -63,7 +67,7 @@ function! tree#go_down() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:default_chars))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
     if c == col
       execute line
       return 1
@@ -75,7 +79,7 @@ endfunction
 function! tree#go_back() abort
   let [line, col] = [line('.')-1, virtcol('.')-1]
   while line > 1
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:default_chars))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
     if c < col
       execute line
       return 1
@@ -88,7 +92,7 @@ function! tree#go_forth() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:default_chars))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
     if c > col
       execute line
       return 1
@@ -101,7 +105,7 @@ function! tree#GetPath() abort
   let path = ''
   let [line, col] = [line('.'), col('.')]
   while line > 1
-    let c = match(getline(line), s:default_chars)
+    let c = match(getline(line), s:regex_name)
     if c < col
       let part = matchstr(getline(line)[c:], '.*')
       " handle symlinks
@@ -117,5 +121,5 @@ endfunction
 function! s:on_cursormoved() abort
   normal! 0
   if line('.') <= 1 | 2 | endif
-  call search(s:default_chars, '', line('.'))
+  call search(s:regex_name, '', line('.'))
 endfunction
