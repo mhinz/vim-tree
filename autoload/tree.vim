@@ -1,4 +1,5 @@
-let s:default_cmd = 'tree -c -F --dirsfirst --noreport'
+let s:default_cmd   = 'tree -c -F --dirsfirst --noreport'
+let s:default_chars = '[^│─├└  ]'
 
 function! tree#Tree(options) abort
   enew
@@ -13,11 +14,30 @@ function! tree#Tree(options) abort
   set filetype=tree
 endfunction
 
-function! tree#GetPath() abort
+function! s:get_name(...) abort
+  if a:0
+    let line = getline(a:1)[a:2:]
+  else
+    let line = getline('.')[col('.')-1:]
+  endif
+  return matchstr(line, '.*')
+endfunction
 
+function! tree#GetPath() abort
+  let path = ''
+  let [line, col] = [line('.'), col('.')]
+  while line > 1
+    let cur_col = match(getline(line), s:default_chars)
+    if cur_col < col
+      let col = cur_col
+      let path = s:get_name(line, col) . path
+    endif
+    let line -= 1
+  endwhile
+  return path
 endfunction
 
 function! s:on_cursormoved() abort
   normal! 0
-  call search('[^│─├└  ]', 'z', line('.'))
+  call search(s:default_chars, '', line('.'))
 endfunction
