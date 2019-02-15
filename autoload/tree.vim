@@ -23,7 +23,7 @@ function! tree#Tree(options) abort
   endif
   silent! %substitute/ / /g
   2
-  setlocal nomodified buftype=nofile bufhidden=wipe
+  setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0
   call s:set_mappings()
   augroup tree
     autocmd!
@@ -32,13 +32,14 @@ function! tree#Tree(options) abort
       autocmd DirChanged <buffer> call tree#Tree(s:last_options)
     endif
   augroup END
-  echo '(q)uit (c)d (e)dit (s)plit (v)split (t)abedit'
+  echo '(q)uit l(c)d (e)dit (s)plit (v)split (t)abedit help(?)'
   highlight default link TreeDirectory Directory
   set filetype=tree
   syntax match TreeDirectory /[^│─├└  ]*\ze\/$/
 endfunction
 
 function! s:set_mappings() abort
+  nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
   nnoremap <silent><buffer><nowait> c :execute 'lcd'     tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> e :execute 'edit'    tree#GetPath()<cr>
@@ -67,8 +68,7 @@ function! tree#go_down() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
-    if c == col
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name)) if c == col
       execute line
       return 1
     endif
@@ -122,4 +122,18 @@ function! s:on_cursormoved() abort
   normal! 0
   if line('.') <= 1 | 2 | endif
   call search(s:regex_name, '', line('.'))
+endfunction
+
+function! tree#Help() abort
+  echo ' ?   this help'
+  echo ' q   wipeout tree buffer'
+  echo ' l   go to directory'
+  echo ' h   go back one directory'
+  echo ' K   go up to next entry of the same level'
+  echo ' J   go down to next entry of the same level'
+  echo ' c   :lcd into current entry and rerun :Tree with the same options'
+  echo ' e   :edit current entry'
+  echo ' s   :split current entry'
+  echo ' v   :vsplit current entry'
+  echo ' t   :tabedit current entry'
 endfunction

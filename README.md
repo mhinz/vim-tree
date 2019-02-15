@@ -1,7 +1,10 @@
 # vim-tree
 
-This plugin integrates good old [tree(1)](http://mama.indstate.edu/users/ice/tree) into
+**vim-tree** integrates good old [tree(1)](http://mama.indstate.edu/users/ice/tree) into
 Vim and Nvim.
+
+The plugin comes with only a single command, `:Tree`, and no options. It is
+perfect for quickly navigating and exploring complex directory hierarchies.
 
 ## Installation
 
@@ -27,6 +30,23 @@ arguments that will simply be added to the default, so `:Tree -a` will run `tree
 -c -F --dirsfirst --noreport -a`.
 
 Tip: For huge directories you might want to set a limit, e.g. `:Tree -L 3`.
+
+Use <kbd>?</kbd> in the tree buffer to get a list of all mappings.
+
+## Customization
+
+- The tree buffer sets the `tree` filetype.
+- `tree#GetPath()` returns the path of the current entry.
+
+Stupid example:
+
+```vim
+autocmd FileType tree
+      \ autocmd CursorMoved <buffer> execute 'pedit' tree#GetPath()
+```
+
+Now, every time you move the cursor to a file, it will be shown in the preview
+window.
 
 ## Author and Feedback
 
