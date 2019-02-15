@@ -28,7 +28,7 @@ function! tree#Tree(options) abort
   augroup tree
     autocmd!
     autocmd CursorMoved <buffer> call s:on_cursormoved()
-    if exists('#DirChanged')
+    if exists('##DirChanged')
       autocmd DirChanged <buffer> call tree#Tree(s:last_options)
     endif
   augroup END
