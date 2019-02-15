@@ -2,13 +2,26 @@ let s:default_cmd   = 'tree -c -F --dirsfirst --noreport'
 let s:default_chars = '[^│─├└  ]'
 
 function! tree#Tree(options) abort
-  enew
   let s:last_options = a:options
-  execute 'silent %!'.get(g:, 'tree_cmd', s:default_cmd).' '.a:options
+  let cmd = s:default_cmd.' '.a:options
+  if !&hidden && &modified
+    echohl WarningMsg | echo 'There are unsaved changes.' | echohl NONE
+    return
+  endif
+  enew
+  let &l:statusline = ' '.cmd
+  execute 'silent %!'.cmd
+  if v:shell_error || getline('1') != '.'
+    redraw!
+    echohl WarningMsg | echo 'Press any button to close this buffer' | echohl NONE
+    call getchar()
+    bwipeout!
+    redraw | echo
+    return
+  endif
   silent! %substitute/ / /g
   2
   setlocal nomodified buftype=nofile bufhidden=wipe
-  let &l:statusline = ' tree '.getcwd()
   call s:set_mappings()
   augroup tree
     autocmd!
@@ -22,15 +35,15 @@ function! tree#Tree(options) abort
 endfunction
 
 function! s:set_mappings() abort
-  nnoremap <silent><buffer> q :bwipeout<cr>
+  nnoremap <silent><buffer> q :bwipeout \| echo<cr>
   nnoremap <silent><buffer> e :execute 'edit'    tree#GetPath()<cr>
   nnoremap <silent><buffer> s :execute 'split'   tree#GetPath()<cr>
   nnoremap <silent><buffer> v :execute 'vsplit'  tree#GetPath()<cr>
   nnoremap <silent><buffer> t :execute 'tabedit' tree#GetPath()<cr>
   nnoremap <silent><buffer> h :call tree#go_back()<cr>
-  nnoremap <silent><buffer> j :call tree#go_down()<cr>
-  nnoremap <silent><buffer> k :call tree#go_up()<cr>
   nnoremap <silent><buffer> l :call tree#go_forth()<cr>
+  nnoremap <silent><buffer> K :call tree#go_up()<cr>
+  nnoremap <silent><buffer> J :call tree#go_down()<cr>
 endfunction
 
 function! tree#go_up() abort
