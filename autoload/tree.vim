@@ -23,23 +23,14 @@ function! s:set_mappings() abort
   nnoremap <silent> t :execute 'tabedit' tree#GetPath()<cr>
 endfunction
 
-function! s:get_name(...) abort
-  if a:0
-    let line = getline(a:1)[a:2:]
-  else
-    let line = getline('.')[col('.')-1:]
-  endif
-  return matchstr(line, '.*')
-endfunction
-
 function! tree#GetPath() abort
   let path = ''
   let [line, col] = [line('.'), col('.')]
   while line > 1
-    let cur_col = match(getline(line), s:default_chars)
-    if cur_col < col
-      let col = cur_col
-      let path = s:get_name(line, col) . path
+    let c = match(getline(line), s:default_chars)
+    if c < col
+      let path = matchstr(getline(line)[c:], '.*') . path
+      let col = c
     endif
     let line -= 1
   endwhile
