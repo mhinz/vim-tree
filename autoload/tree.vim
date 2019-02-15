@@ -68,7 +68,8 @@ function! tree#go_down() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name)) if c == col
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
+    if c == col
       execute line
       return 1
     endif
