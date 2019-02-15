@@ -1,7 +1,7 @@
 scriptencoding utf-8
 
 let s:default_cmd = 'tree -c -F --dirsfirst --noreport'
-let s:regex_name = ' \zs[^`|-│─├└  ]'
+let s:entry_start_regex = '[^`|-│─├└  ]'
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
@@ -55,7 +55,7 @@ endfunction
 function! tree#go_up() abort
   let [line, col] = [line('.')-1, virtcol('.')-1]
   while line > 1
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
     if c == col
       execute line
       return 1
@@ -68,7 +68,7 @@ function! tree#go_down() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
     if c == col
       execute line
       return 1
@@ -80,7 +80,7 @@ endfunction
 function! tree#go_back() abort
   let [line, col] = [line('.')-1, virtcol('.')-1]
   while line > 1
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
     if c < col
       execute line
       return 1
@@ -93,7 +93,7 @@ function! tree#go_forth() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:regex_name))
+    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
     if c > col
       execute line
       return 1
@@ -106,7 +106,7 @@ function! tree#GetPath() abort
   let path = ''
   let [line, col] = [line('.'), col('.')]
   while line > 1
-    let c = match(getline(line), s:regex_name)
+    let c = match(getline(line), ' \zs'.s:entry_start_regex)
     if c < col
       let part = matchstr(getline(line)[c:], '.*')
       " handle symlinks
@@ -122,7 +122,7 @@ endfunction
 function! s:on_cursormoved() abort
   normal! 0
   if line('.') <= 1 | 2 | endif
-  call search(s:regex_name, '', line('.'))
+  call search(' \zs'.s:entry_start_regex, '', line('.'))
 endfunction
 
 function! tree#Help() abort
