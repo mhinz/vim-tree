@@ -6,6 +6,8 @@ Vim and Nvim.
 The plugin comes with only a single command, `:Tree`, and no options. It is
 perfect for quickly navigating and exploring complex directory hierarchies.
 
+![vim-tree in action](./demo.svg)
+
 ## Installation
 
 Use your favorite plugin manager. E.g. [vim-plug](https://github.com/junegunn/vim-plug):
