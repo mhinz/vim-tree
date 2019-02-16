@@ -94,6 +94,10 @@ function! tree#go_forth() abort
   let last_line = line('$')
   while line <= last_line
     let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
+    if c < col
+      " cursor is on empty directory
+      break
+    endif
     if c > col
       execute line
       return 1
