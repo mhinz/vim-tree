@@ -27,9 +27,9 @@ Then restart Vim and `:PlugInstall`.
 
 There are no options and only one command: `:Tree`.
 
-That command defaults to `tree -c -F --dirsfirst --noreport`. It takes optional
+That command defaults to `tree -F --dirsfirst --noreport`. It takes optional
 arguments that will simply be added to the default, so `:Tree -a` will run `tree
--c -F --dirsfirst --noreport -a`.
+-F --dirsfirst --noreport -a`.
 
 Tip: For huge directories you might want to set a limit, e.g. `:Tree -L 3`.
 

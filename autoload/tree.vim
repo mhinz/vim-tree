@@ -1,6 +1,6 @@
 scriptencoding utf-8
 
-let s:default_cmd = 'tree -c -F --dirsfirst --noreport'
+let s:default_cmd = 'tree -F --dirsfirst --noreport'
 let s:entry_start_regex = '[^ │─├└`|-]'
 
 function! tree#Tree(options) abort
