@@ -1,11 +1,12 @@
 scriptencoding utf-8
 
-let s:default_cmd = 'tree -n -F --dirsfirst --noreport'
+let s:default_cmd = has('win32') ? 'tree.exe' : 'tree'
+let s:default_options = '-n -F --dirsfirst --noreport'
 let s:entry_start_regex = '[^ │─├└`|-]'
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
-  let cmd = s:default_cmd.' '.a:options.' '.getcwd()
+  let cmd = printf('%s %s %s %s', s:default_cmd, s:default_options, a:options, getcwd())
   if !&hidden && &modified
     echohl WarningMsg | echo 'There are unsaved changes.' | echohl NONE
     return

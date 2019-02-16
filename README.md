@@ -1,10 +1,10 @@
 # vim-tree
 
 **vim-tree** integrates good old [tree(1)](http://mama.indstate.edu/users/ice/tree) into
-Vim and Nvim.
+Vim and Nvim for all common operating systems.
 
-The plugin comes with only a single command, `:Tree`, and no options. It is
-perfect for quickly navigating and exploring complex directory hierarchies.
+The plugin provides a single command, `:Tree`, and has no options. It is perfect
+for quickly navigating and exploring complex directory hierarchies.
 
 ![vim-tree in action](./demo.svg)
 
@@ -18,10 +18,22 @@ Then restart Vim and `:PlugInstall`.
 
 ## Dependencies
 
-[tree(1)](http://mama.indstate.edu/users/ice/tree) needs to be installed.
+[tree](http://mama.indstate.edu/users/ice/tree) needs to be installed.
 
-- Ubuntu/Debian: `sudo apt-get install tree`
-- macOS: `brew install tree`
+#### Ubuntu/Debian
+
+    $ sudo apt-get install tree
+
+#### macOS
+
+    $ brew install tree
+
+#### Windows
+
+1. Download the [win32 tree binary zip archive](http://downloads.sourceforge.net/gnuwin32/tree-1.5.2.2-bin.zip).
+1. Unzip the archive.
+1. Move `tree.exe` from the `bin` directory to the directory containing your
+   `vim.exe` or `nvim.exe`. E.g. `C:\Program Files (x86)\Vim\vim81\`.
 
 ## Usage
 
