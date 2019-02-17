@@ -15,7 +15,7 @@ function! tree#Tree(options) abort
   enew
   let &l:statusline = ' '.cmd
   execute 'silent %!'.cmd
-  if v:shell_error || getline(1) =~# ' [error opening dir]'
+  if v:shell_error || getline(1) =~# '\V [error opening dir]'
     redraw!
     echohl WarningMsg | echo 'Press any button to close this buffer' | echohl NONE
     call getchar()
