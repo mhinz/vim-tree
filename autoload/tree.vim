@@ -6,7 +6,8 @@ let s:entry_start_regex = '[^ │─├└`|-]'
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
-  let cmd = printf('%s %s %s %s', s:default_cmd, s:default_options, a:options, getcwd())
+  let cmd = printf('%s %s %s %s',
+        \ s:default_cmd, s:default_options, a:options, shellescape(getcwd()))
   if !&hidden && &modified
     echohl WarningMsg | echo 'There are unsaved changes.' | echohl NONE
     return
@@ -14,7 +15,7 @@ function! tree#Tree(options) abort
   enew
   let &l:statusline = ' '.cmd
   execute 'silent %!'.cmd
-  if v:shell_error || !isdirectory(getline('1'))
+  if v:shell_error || getline(1) =~# ' [error opening dir]'
     redraw!
     echohl WarningMsg | echo 'Press any button to close this buffer' | echohl NONE
     call getchar()
