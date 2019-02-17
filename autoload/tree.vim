@@ -115,9 +115,17 @@ function! tree#GetPath() abort
     let c = match(getline(line), ' \zs'.s:entry_start_regex)
     if c < col
       let part = matchstr(getline(line)[c:], '.*')
-      " handle symlinks
+      " Handle symlinks.
       let part = substitute(part, ' ->.*', '', '')
-      let path = part . path
+      " With `tree -Q`, every part is always surrounded by double quotes.
+      if match(s:last_options, '-Q') >= 0
+        let part = part =~ '/$'
+              \ ? strpart(part, 1, strchars(part) - 3).'/'
+              \ : strpart(part, 1, strchars(part) - 2)
+        let part = substitute(part, '\"', '"', 'g')
+        " By now we have normalized `part` as if -Q was never used.
+      endif
+      let path = escape(part, '"') . path
       let col = c
     endif
     let line -= 1

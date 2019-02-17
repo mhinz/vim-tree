@@ -30,8 +30,7 @@ Then restart Vim and `:PlugInstall`.
 
 #### Windows
 
-1. Download the [win32 tree binary zip archive](http://downloads.sourceforge.net/gnuwin32/tree-1.5.2.2-bin.zip).
-1. Unzip the archive.
+1. Download the [win32 tree binary zip archive](http://downloads.sourceforge.net/gnuwin32/tree-1.5.2.2-bin.zip) and unzip it.
 1. Move `tree.exe` from the `bin` directory to the directory containing your
    `vim.exe` or `nvim.exe`. E.g. `C:\Program Files (x86)\Vim\vim81\`.
 
@@ -43,9 +42,13 @@ That command defaults to `tree -n -F --dirsfirst --noreport`. It takes optional
 arguments that will simply be added to the default, so `:Tree -a` will run `tree
 -n -F --dirsfirst --noreport -a`.
 
-Tip: For huge directories you might want to set a limit, e.g. `:Tree -L 3`.
-
 Use <kbd>?</kbd> in the tree buffer to get a list of all mappings.
+
+A few tips:
+
+- For huge directories you might want to set a limit, e.g. `:Tree -L 3`.
+- If many files have spaces in their names, `:Tree -Q` might provide more
+  readable output.
 
 ## Customization
 
