@@ -43,11 +43,12 @@ endfunction
 function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
-  nnoremap <silent><buffer><nowait> c :execute 'lcd'     tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> e :execute 'edit'    tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> s :execute 'split'   tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> v :execute 'vsplit'  tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> t :execute 'tabedit' tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> c :execute 'lcd'              tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> e :execute 'edit'             tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> s :execute 'split'            tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> v :execute 'vsplit'           tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> t :execute 'tabedit'          tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> h :call tree#go_back()<cr>
   nnoremap <silent><buffer><nowait> l :call tree#go_forth()<cr>
   nnoremap <silent><buffer><nowait> K :call tree#go_up()<cr>
@@ -153,6 +154,7 @@ function! tree#Help() abort
   echo ' J   go down to next entry of the same level'
   echo ' c   :lcd into current entry and rerun :Tree with the same options'
   echo ' e   :edit current entry'
+  echo ' p   :edit current entry in previous (last accessed) window'
   echo ' s   :split current entry'
   echo ' v   :vsplit current entry'
   echo ' t   :tabedit current entry'
