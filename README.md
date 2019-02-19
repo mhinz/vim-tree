@@ -50,6 +50,16 @@ A few tips:
 - If many files have spaces in their names, `:Tree -Q` might provide more
   readable output.
 
+---
+
+To keep a navigator-like window open:
+
+```vim
+:leftabove 40vnew | Tree
+```
+
+Then use `p` to open the current entry in the previous window.
+
 ## Customization
 
 - The tree buffer sets the `tree` filetype.
