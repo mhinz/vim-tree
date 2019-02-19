@@ -137,6 +137,11 @@ function! s:on_cursormoved() abort
   normal! 0
   if line('.') <= 1 && line('$') > 1 | 2 | endif
   call search(' \zs'.s:entry_start_regex, '', line('.'))
+  if virtcol('.') >= winwidth(0) / 2
+    execute 'normal! zs'.(winwidth(0)/4).'zh'
+  else
+    normal! ze
+  endif
 endfunction
 
 function! tree#Help() abort
