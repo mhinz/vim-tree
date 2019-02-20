@@ -60,6 +60,14 @@ To keep a navigator-like window open:
 
 Then use `p` to open the current entry in the previous window.
 
+---
+
+To fold on directories:
+
+```vim
+autocmd FileType tree setlocal foldmethod=expr
+```
+
 ## Customization
 
 - The tree buffer sets the `tree` filetype.
