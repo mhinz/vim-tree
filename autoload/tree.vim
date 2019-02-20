@@ -87,7 +87,7 @@ function! tree#go_back() abort
     let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
     if c < col
       execute line
-      normal! zc
+      silent! normal! zc
       return 1
     endif
     let line -= 1
@@ -105,7 +105,7 @@ function! tree#go_forth() abort
     endif
     if c > col
       execute line
-      normal! zo
+      silent! normal! zo
       return 1
     endif
     let line += 1
