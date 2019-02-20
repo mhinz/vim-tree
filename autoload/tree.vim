@@ -34,6 +34,7 @@ function! tree#Tree(options) abort
       autocmd DirChanged <buffer> call tree#Tree(s:last_options)
     endif
   augroup END
+  set foldexpr=tree#get_foldlevel(v:lnum)
   echo '(q)uit l(c)d (e)dit (s)plit (v)split (t)abedit help(?)'
   highlight default link TreeDirectory Directory
   set filetype=tree
@@ -142,6 +143,14 @@ function! s:on_cursormoved() abort
     execute 'normal! zs'.(winwidth(0)/4).'zh'
   else
     normal! ze
+  endif
+endfunction
+
+function! tree#get_foldlevel(lnum)
+  let line = getline(a:lnum)
+  return line =~ '/$'
+        \ ? '>'.(strwidth(matchstr(line, '.\{-}\ze'.s:entry_start_regex)) / 4)
+        \ : '='
   endif
 endfunction
 
