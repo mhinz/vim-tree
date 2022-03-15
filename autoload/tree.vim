@@ -3,6 +3,7 @@ scriptencoding utf-8
 let s:default_cmd = has('win32') ? 'tree.exe' : 'tree'
 let s:default_options = '-n -F --dirsfirst --noreport'
 let s:entry_start_regex = '[^ │─├└`|-]'
+let s:entry_start_regex = '^[│─├└ ␣]\+\(\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?\s\+'
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
@@ -37,8 +38,10 @@ function! tree#Tree(options) abort
   set foldexpr=tree#get_foldlevel(v:lnum)
   echo '(q)uit l(c)d (e)dit (s)plit (v)split (t)abedit help(?)'
   highlight default link TreeDirectory Directory
+  highlight default link TreeSize      SpecialKey
   set filetype=tree
   syntax match TreeDirectory /[^│─├└  ]*\ze\/$/
+  syntax match TreeSize      /^[│─├└ ␣]\+\zs\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\ze\s\+\S/
 endfunction
 
 function! s:set_mappings() abort
@@ -59,7 +62,7 @@ endfunction
 function! tree#go_up() abort
   let [line, col] = [line('.')-1, virtcol('.')-1]
   while line > 1
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
+    let c = strwidth(matchstr(getline(line), s:entry_start_regex))
     if c == col
       execute line
       return 1
@@ -72,7 +75,7 @@ function! tree#go_down() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
+    let c = strwidth(matchstr(getline(line), s:entry_start_regex))
     if c == col
       execute line
       return 1
@@ -84,7 +87,7 @@ endfunction
 function! tree#go_back() abort
   let [line, col] = [line('.')-1, virtcol('.')-1]
   while line > 1
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
+    let c = strwidth(matchstr(getline(line), s:entry_start_regex))
     if c < col
       execute line
       silent! normal! zc
@@ -98,7 +101,7 @@ function! tree#go_forth() abort
   let [line, col] = [line('.')+1, virtcol('.')-1]
   let last_line = line('$')
   while line <= last_line
-    let c = strwidth(matchstr(getline(line), '.\{-}\ze'.s:entry_start_regex))
+    let c = strwidth(matchstr(getline(line), s:entry_start_regex))
     if c < col
       " cursor is on empty directory
       break
@@ -116,7 +119,7 @@ function! tree#GetPath() abort
   let path = ''
   let [line, col] = [line('.'), col('.')]
   while line > 1
-    let c = match(getline(line), ' \zs'.s:entry_start_regex)
+    let c = match(getline(line), s:entry_start_regex.'\zs')
     if c < col
       let part = matchstr(getline(line)[c:], '.*')
       " Handle symlinks.
@@ -140,7 +143,7 @@ endfunction
 function! s:on_cursormoved() abort
   normal! 0
   if line('.') <= 1 && line('$') > 1 | 2 | endif
-  call search(' \zs'.s:entry_start_regex, '', line('.'))
+  let ln= search(s:entry_start_regex.'\zs', '', line('.'))
   if virtcol('.') >= winwidth(0) / 2
     execute 'normal! zs'.(winwidth(0)/4).'zh'
   else
@@ -151,7 +154,7 @@ endfunction
 function! tree#get_foldlevel(lnum)
   let line = getline(a:lnum)
   return line =~ '/$'
-        \ ? '>'.(strwidth(matchstr(line, '.\{-}\ze'.s:entry_start_regex)) / 4)
+        \ ? '>'.(strwidth(matchstr(line, s:entry_start_regex)) / 4)
         \ : '='
   endif
 endfunction
