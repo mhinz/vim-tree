@@ -57,6 +57,7 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> l :call tree#go_forth()<cr>
   nnoremap <silent><buffer><nowait> K :call tree#go_up()<cr>
   nnoremap <silent><buffer><nowait> J :call tree#go_down()<cr>
+  nnoremap <silent><buffer><nowait> x :call tree#open_term()<cr>
 endfunction
 
 function! tree#go_up() abort
@@ -159,6 +160,16 @@ function! tree#get_foldlevel(lnum)
   endif
 endfunction
 
+function! tree#open_term()
+  split
+  execute 'lcd' tree#GetPath()
+  if has('nvim')
+    terminal
+  else
+    terminal ++curwin
+  endif
+endfunction
+
 function! tree#Help() abort
   echo ' ?   this help'
   echo ' q   wipeout tree buffer'
@@ -172,4 +183,5 @@ function! tree#Help() abort
   echo ' s   :split current entry'
   echo ' v   :vsplit current entry'
   echo ' t   :tabedit current entry'
+  echo ' x   :terminal on current entry'
 endfunction
