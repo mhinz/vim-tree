@@ -52,6 +52,7 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
   nnoremap <silent><buffer><nowait> c :execute 'lcd'              tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> H :lcd ..<cr>
   nnoremap <silent><buffer><nowait> e :execute 'edit'             tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> s :execute 'split'            tree#GetPath()<cr>
@@ -190,6 +191,7 @@ function! tree#Help() abort
   echo ' J   go down to next entry of the same level'
   echo ' r   reload tree with the same options'
   echo ' c   :lcd into current entry and rerun :Tree with the same options'
+  echo ' H   :lcd into the parent directory and rerun :Tree with the same options'
   echo ' e   :edit current entry'
   echo ' p   :edit current entry in previous (last accessed) window'
   echo ' s   :split current entry'
