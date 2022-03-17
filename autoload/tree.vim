@@ -26,6 +26,10 @@ function! tree#Tree(options) abort
   endif
   silent! %substitute/ / /g
   2
+  if exists("s:saved_pos")
+    call setpos('.', s:saved_pos)
+    unlet s:saved_pos
+  endif
   setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0
   call s:set_mappings()
   augroup tree
@@ -53,6 +57,7 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> s :execute 'split'            tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> v :execute 'vsplit'           tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> t :execute 'tabedit'          tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> r :call tree#reload()<cr>
   nnoremap <silent><buffer><nowait> h :call tree#go_back()<cr>
   nnoremap <silent><buffer><nowait> l :call tree#go_forth()<cr>
   nnoremap <silent><buffer><nowait> K :call tree#go_up()<cr>
@@ -141,6 +146,12 @@ function! tree#GetPath() abort
   return path
 endfunction
 
+function! tree#reload() abort
+  let s:saved_pos = getcurpos()
+  let s:saved_entry = tree#GetPath()
+  call tree#Tree(s:last_options)
+endfunction
+
 function! s:on_cursormoved() abort
   normal! 0
   if line('.') <= 1 && line('$') > 1 | 2 | endif
@@ -177,6 +188,7 @@ function! tree#Help() abort
   echo ' h   go back one directory'
   echo ' K   go up to next entry of the same level'
   echo ' J   go down to next entry of the same level'
+  echo ' r   reload tree with the same options'
   echo ' c   :lcd into current entry and rerun :Tree with the same options'
   echo ' e   :edit current entry'
   echo ' p   :edit current entry in previous (last accessed) window'
