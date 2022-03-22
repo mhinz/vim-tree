@@ -150,7 +150,10 @@ endfunction
 function! tree#reload() abort
   let s:saved_pos = getcurpos()
   let s:saved_entry = tree#GetPath()
+  call tree#save_folds()
   call tree#Tree(s:last_options)
+  normal! zR
+  call tree#restore_folds()
 endfunction
 
 function! s:on_cursormoved() abort
@@ -162,6 +165,100 @@ function! s:on_cursormoved() abort
   else
     normal! ze
   endif
+endfunction
+
+function! tree#save_folds() abort
+  let save_pos = getcurpos()
+  let s:saved_folds = []
+  for lnum in range(1, line('$'))
+    execute 'normal! ' . lnum . 'G'
+    " TODO: Only visit directories?
+    let foldstart = foldclosed(lnum)
+    if foldstart ==# -1
+      continue
+    endif
+
+    if foldlevel(lnum) == 0
+      continue
+    endif
+
+    if getline(lnum-1)[-1:] !=# '/'
+      continue
+    endif
+
+    let foldend   = foldclosedend(lnum)
+    let entry = {}
+    let entry['lnum']      = lnum
+    let entry['path']      = tree#GetPath()
+    "let entry['path']      = getline('.')
+    let entry['filename']  = matchstr(getline('.'), s:entry_start_regex . '\zs.*')
+    let entry['foldlevel'] = foldlevel(lnum)
+    let entry['folded']    = foldstart != -1
+    call add(s:saved_folds, entry)
+
+    if foldstart != -1
+      normal! zo
+    endif
+  endfor
+
+  call reverse(s:saved_folds)
+
+  call setpos('.', save_pos)
+endfunction
+
+function! tree#restore_folds() abort
+  if !exists('s:saved_folds')
+    return
+  endif
+
+  let save_pos = getcurpos()
+  normal! G
+  for entry in s:saved_folds
+    let lnum = s:search_path(entry['filename'], entry['path'])
+    " skip this entry if it doesn't exist anymore
+    if lnum ==# -1
+      continue
+    endif
+
+    " skip this entry if it is not folded (and therefore cannot be opened or closed)
+    if entry['foldlevel'] == 0
+      continue
+    endif
+
+    if entry['folded'] == 0
+      normal! zo
+    else
+      normal zc
+    endif
+  endfor
+  unlet s:saved_folds
+  call setpos('.', save_pos)
+endfunction
+
+function! s:search_path(filename, full_path) abort
+  " https://stackoverflow.com/a/11311701/572645
+  let escaped_filename = '\V' . escape(a:filename, '/\%')
+  let startline = line('.')
+  let lnum = search(s:entry_start_regex . '\zs' . escaped_filename, 'bcw')
+  if tree#GetPath() ==# a:full_path
+    return lnum
+  endif
+
+  " if this is not yet the correct path, search until we find it
+  let first_match= lnum
+  while v:true
+    let startline = line('.')
+    let lnum = search(s:entry_start_regex . '\zs' . escaped_filename, 'bw')
+    " abort if we found the first match again
+    if lnum ==# first_match
+      return -1
+    endif
+
+    " end the search if we found the correct path
+    if tree#GetPath() ==# a:full_path
+      return lnum
+    endif
+  endwhile
 endfunction
 
 function! tree#get_foldlevel(lnum)
