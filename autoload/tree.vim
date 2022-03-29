@@ -4,6 +4,7 @@ let s:default_cmd = has('win32') ? 'tree.exe' : 'tree'
 let s:default_options = '-n -F --dirsfirst --noreport'
 let s:entry_start_regex = '[^ │─├└`|-]'
 let s:entry_start_regex = '^[│─├└ ␣]\+\(\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?\s\+'
+let s:entry_start_regex_fold = '^\([ │─├└`|-]\{4}\)\+'
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
@@ -263,10 +264,7 @@ endfunction
 
 function! tree#get_foldlevel(lnum)
   let line = getline(a:lnum)
-  return line =~ '/$'
-        \ ? '>'.(strwidth(matchstr(line, s:entry_start_regex)) / 4)
-        \ : '='
-  endif
+  return (strwidth(matchstr(line, s:entry_start_regex_fold)) / 4)
 endfunction
 
 function! tree#open_term()
