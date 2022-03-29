@@ -31,7 +31,7 @@ function! tree#Tree(options) abort
     call setpos('.', s:saved_pos)
     unlet s:saved_pos
   endif
-  setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0
+  setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0 foldtext=foldtext#foldtext()
   call s:set_mappings()
   augroup tree
     autocmd!
