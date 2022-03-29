@@ -1,5 +1,4 @@
 scriptencoding utf-8
-
 let s:default_cmd = has('win32') ? 'tree.exe' : 'tree'
 let s:default_options = '-n -F --dirsfirst --noreport'
 let s:entry_start_regex = '[^ │─├└`|-]'
@@ -33,6 +32,7 @@ function! tree#Tree(options) abort
   endif
   setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0 foldtext=foldtext#foldtext()
   call s:set_mappings()
+  call foldtext#set_fold_mappings()
   augroup tree
     autocmd!
     autocmd CursorMoved <buffer> call s:on_cursormoved()
