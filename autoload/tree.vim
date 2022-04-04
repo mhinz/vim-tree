@@ -45,8 +45,9 @@ function! tree#Tree(options) abort
   highlight default link TreeDirectory Directory
   highlight default link TreeSize      SpecialKey
   set filetype=tree
-  syntax match TreeDirectory /[^│─├└  ]*\ze\/$/
-  syntax match TreeSize      /^[│─├└ ␣]\+\zs\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\ze\s\+\S/
+  syntax match  TreeDirectory /[^│─├└]*\/$/
+  syntax region TreeSize      start=/[│─├└ ␣]*\zs\[/ end=/\]/ containedin=ALL
+  syntax region TreeBars      start=/^/              end=/\ze[^│─├└␣ ]/
 endfunction
 
 function! s:set_mappings() abort
