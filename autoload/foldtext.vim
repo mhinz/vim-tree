@@ -108,3 +108,12 @@ function! foldtext#set_fold_mappings() abort
   nnoremap <buffer> <expr> za foldtext#apply_fold_operation('za')
   nnoremap <buffer> <expr> zA foldtext#apply_fold_operation('zA')
 endfunction
+
+function! foldtext#unset_fold_mappings() abort
+  nunmap <buffer> <expr> zo
+  nunmap <buffer> <expr> zO
+  nunmap <buffer> <expr> zc
+  nunmap <buffer> <expr> zC
+  nunmap <buffer> <expr> za
+  nunmap <buffer> <expr> zA
+endfunction

@@ -273,6 +273,7 @@ function! tree#restore_folds() abort
     return
   endif
 
+  call foldtext#unset_fold_mappings()
   let save_pos = getcurpos()
   normal! G
   for entry in s:saved_folds
@@ -287,6 +288,13 @@ function! tree#restore_folds() abort
       continue
     endif
 
+    execute 'normal! ' . lnum . 'G'
+    " FIXME: Only apply folding operation if the current state isn't yet
+    "        correct?
+    "        Especially on closing it would be possible to close the wrong
+    "        fold otherwise.
+    "        Alternatively open everything before and only close what has
+    "        to be closed.
     if entry['folded'] == 0
       normal! zo
     else
@@ -295,6 +303,7 @@ function! tree#restore_folds() abort
   endfor
   unlet s:saved_folds
   call setpos('.', save_pos)
+  call foldtext#set_fold_mappings()
 endfunction
 
 function! s:search_path(filename, full_path) abort
