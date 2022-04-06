@@ -10,6 +10,10 @@ let s:prefix_and_path .= '\s\+\(.*\)'
 let s:prefix_and_path_cache = {}
 let s:path_cache = {}
 
+if !exists('g:tree_remember_fold_state')
+  let g:tree_remember_fold_state = 1
+endif
+
 function! tree#Tree(options) abort
   let s:last_options = a:options
   let cmd = printf('%s %s %s %s',
@@ -212,19 +216,28 @@ endfunction
 function! tree#reload() abort
   let s:saved_pos = getcurpos()
   let s:saved_entry = tree#GetPath()
-  let start=reltime()
-  call tree#save_folds()
-  let save_duration = reltimestr(reltime(start))
+
+  if g:tree_remember_fold_state
+    echohl MoreMsg | echo "Remembering all folds for later restore (avoid by setting g:tree_remember_fold_state = 0)" | echohl None
+    let start=reltime()
+    call tree#save_folds()
+    let save_duration = reltimestr(reltime(start))
+    echom "SAVE    dauerte: " . save_duration
+  endif
+
   let start=reltime()
   call tree#Tree(s:last_options)
   let tree_duration = reltimestr(reltime(start))
-  normal! zR
-  let start=reltime()
-  call tree#restore_folds()
-  let restore_duration = reltimestr(reltime(start))
-  echom "SAVE    dauerte: " . save_duration
   echom "TREE    dauerte: " . tree_duration
-  echom "RESTORE dauerte: " . restore_duration
+
+  if g:tree_remember_fold_state
+    echohl MoreMsg | echo "Restoring all folds" | echohl None
+    normal! zR
+    let start=reltime()
+    call tree#restore_folds()
+    let restore_duration = reltimestr(reltime(start))
+    echom "RESTORE dauerte: " . restore_duration
+  endif
 endfunction
 
 function! s:on_cursormoved() abort
