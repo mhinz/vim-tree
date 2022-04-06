@@ -57,6 +57,7 @@ function! tree#Tree(options) abort
   echo '(q)uit l(c)d (e)dit (s)plit (v)split (t)abedit help(?)'
   highlight default link TreeDirectory Directory
   highlight default link TreeSize      SpecialKey
+  highlight default link TreeBars      NonText
   set filetype=tree
   syntax match  TreeDirectory /[^│─├└]*\/$/
   syntax region TreeSize      start=/[│─├└ ␣]*\zs\[/ end=/\]/ containedin=ALL
