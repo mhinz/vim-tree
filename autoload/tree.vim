@@ -220,6 +220,7 @@ endfunction
 function! tree#reload() abort
   let s:saved_pos = getcurpos()
   let s:saved_entry = tree#GetPath()
+  let winline = winline()
 
   if g:tree_remember_fold_state
     echohl MoreMsg | echo "Remembering all folds for later restore (avoid by setting g:tree_remember_fold_state = 0)" | echohl None
@@ -241,6 +242,15 @@ function! tree#reload() abort
     call tree#restore_folds()
     let restore_duration = reltimestr(reltime(start))
     silent! call s:log.debug('tree#reload(): Restoring folds took: ' . restore_duration . ' seconds.')
+  endif
+
+  " Restore scroll position in case it has changed after reload
+  let winline2 = winline()
+  let scrolldiff = winline - winline2
+  if scrolldiff > 0
+    execute "normal! ".scrolldiff."\<C-Y>"
+  elseif scrolldiff < 0
+    execute "normal! ".abs(scrolldiff)."\<C-E>"
   endif
 endfunction
 
