@@ -4,6 +4,11 @@ let s:default_options = '-n -F --dirsfirst --noreport'
 let s:entry_start_regex = '[^ │─├└`|-]'
 let s:entry_start_regex = '^[│─├└ ␣]\+\(\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?\s\+'
 let s:entry_start_regex_fold = '^\([ │─├└`|-]\{4}\)\+'
+let s:prefix_and_path =  '^\([│─├└ ␣]\+\)'
+let s:prefix_and_path .= '\(\[\s*[0-9]\+\%(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?'
+let s:prefix_and_path .= '\s\+\(.*\)'
+let s:prefix_and_path_cache = {}
+let s:path_cache = {}
 
 function! tree#Tree(options) abort
   let s:last_options = a:options
@@ -48,6 +53,9 @@ function! tree#Tree(options) abort
   syntax match  TreeDirectory /[^│─├└]*\/$/
   syntax region TreeSize      start=/[│─├└ ␣]*\zs\[/ end=/\]/ containedin=ALL
   syntax region TreeBars      start=/^/              end=/\ze[^│─├└␣ ]/
+
+  let s:prefix_and_path_cache = {}
+  let s:path_cache = {}
 endfunction
 
 function! s:set_mappings() abort
@@ -124,28 +132,80 @@ function! tree#go_forth() abort
   endwhile
 endfunction
 
+function! tree#get_prefix_and_path(lnum, only_dirs) abort
+  let line = getline(a:lnum)
+  if a:only_dirs && line[-1:] != '/'
+    return []
+  endif
+
+  if has_key(s:prefix_and_path_cache, a:lnum)
+    return s:prefix_and_path_cache[a:lnum]
+  endif
+
+  let match = matchlist(line, s:prefix_and_path)
+
+  " now normalize the path
+  let path = match[3]
+
+  " 1. Handle symlinks.
+  let path = substitute(path, ' ->.*', '', '')
+
+  " 2. With `tree -Q`, every part is always surrounded by double quotes.
+  if match(s:last_options, '-Q') >= 0
+    let path = path =~ '/$'
+          \ ? strpart(path, 1, strchars(path) - 3).'/'
+          \ : strpart(path, 1, strchars(path) - 2)
+    let path = substitute(path, '\"', '"', 'g')
+    " By now we have normalized `part` as if -Q was never used.
+  endif
+
+  " 3. Handle double quotes in file names
+  let path = escape(path, '"')
+
+  let match[3] = path
+
+  let s:prefix_and_path_cache[a:lnum] = match
+  return match
+endfunction
+
 function! tree#GetPath() abort
-  let path = ''
-  let [line, col] = [line('.'), col('.')]
-  while line > 1
-    let c = match(getline(line), s:entry_start_regex.'\zs')
-    if c < col
-      let part = matchstr(getline(line)[c:], '.*')
-      " Handle symlinks.
-      let part = substitute(part, ' ->.*', '', '')
-      " With `tree -Q`, every part is always surrounded by double quotes.
-      if match(s:last_options, '-Q') >= 0
-        let part = part =~ '/$'
-              \ ? strpart(part, 1, strchars(part) - 3).'/'
-              \ : strpart(part, 1, strchars(part) - 2)
-        let part = substitute(part, '\"', '"', 'g')
-        " By now we have normalized `part` as if -Q was never used.
-      endif
-      let path = escape(part, '"') . path
-      let col = c
-    endif
+  return tree#GetPathAt(line('.'))
+endfunction
+
+function! tree#GetPathAt(lnum) abort
+  if has_key(s:path_cache, a:lnum)
+    return s:path_cache[a:lnum]
+  endif
+
+  let prefix_and_path = tree#get_prefix_and_path(a:lnum, v:false)
+  if prefix_and_path ==# []
+    return ''
+  endif
+
+  let depth = strchars(prefix_and_path[1])
+  let path  = prefix_and_path[3]
+
+  let line = a:lnum - 1
+  while line > 1 && depth > 4 " depth == 4 is a toplevel dir
+    " FIXME: This is a bottleneck. On large trees this method is called
+    " over and over again. Could we reduce that by using a recursive method
+    " here?
+    let prefix_and_path = tree#get_prefix_and_path(line, v:true)
     let line -= 1
+
+    if prefix_and_path ==# []
+      continue
+    endif
+
+    if strchars(prefix_and_path[1]) >= depth
+      continue
+    endif
+
+    let path = prefix_and_path[3] . path
+    let depth = strchars(prefix_and_path[1])
   endwhile
+
+  let s:path_cache[a:lnum] = path
   return path
 endfunction
 
