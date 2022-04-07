@@ -14,6 +14,10 @@ if !exists('g:tree_remember_fold_state')
   let g:tree_remember_fold_state = 1
 endif
 
+" prepare logging with https://github.com/hupfdule/log.vim (if available)
+silent! let s:log = log#getLogger(expand('<sfile>:t'))
+
+
 function! tree#Tree(options) abort
   let s:last_options = a:options
   let cmd = printf('%s %s %s %s',
@@ -222,13 +226,13 @@ function! tree#reload() abort
     let start=reltime()
     call tree#save_folds()
     let save_duration = reltimestr(reltime(start))
-    echom "SAVE    dauerte: " . save_duration
+    silent! call s:log.debug('tree#reload(): Saving folds took: ' . save_duration . ' seconds.')
   endif
 
   let start=reltime()
   call tree#Tree(s:last_options)
   let tree_duration = reltimestr(reltime(start))
-  echom "TREE    dauerte: " . tree_duration
+  silent! call s:log.debug('tree#reload(): Rebuilding tree took: ' . tree_duration . ' seconds.')
 
   if g:tree_remember_fold_state
     echohl MoreMsg | echo "Restoring all folds" | echohl None
@@ -236,7 +240,7 @@ function! tree#reload() abort
     let start=reltime()
     call tree#restore_folds()
     let restore_duration = reltimestr(reltime(start))
-    echom "RESTORE dauerte: " . restore_duration
+    silent! call s:log.debug('tree#reload(): Restoring folds took: ' . restore_duration . ' seconds.')
   endif
 endfunction
 
@@ -259,14 +263,17 @@ function! tree#save_folds() abort
     " TODO: Only visit directories?
     let foldstart = foldclosed(lnum)
     if foldstart ==# -1
+      silent! call s:log.trace('tree#save_folds(): Line ' . lnum . ' is ignored, since it is not in a fold.')
       continue
     endif
 
     if foldlevel(lnum) == 0
+      silent! call s:log.trace('tree#save_folds(): Line ' . lnum . ' is ignored, since it has foldlevel 0.')
       continue
     endif
 
     if getline(lnum-1)[-1:] !=# '/'
+      silent! call s:log.trace('tree#save_folds(): Line ' . lnum . ' is ignored, since it is not a directory.')
       continue
     endif
 
@@ -287,11 +294,20 @@ function! tree#save_folds() abort
 
   call reverse(s:saved_folds)
 
+  if exists('s:log')
+    let log_saved_folds = ''
+    for sf in s:saved_folds
+      let log_saved_folds .= '  ' . string(sf) . "\n"
+    endfor
+    silent! call s:log.debug("tree#save_folds(): Saved folds: \n" . log_saved_folds)
+  endif
+
   call setpos('.', save_pos)
 endfunction
 
 function! tree#restore_folds() abort
   if !exists('s:saved_folds')
+    silent! call s:log.trace('tree#restore_folds(): Not restoring anything since no folds are saved')
     return
   endif
 
@@ -302,11 +318,13 @@ function! tree#restore_folds() abort
     let lnum = s:search_path(entry['filename'], entry['path'])
     " skip this entry if it doesn't exist anymore
     if lnum ==# -1
+      silent! call s:log.trace('tree#restore_folds(): Line ' . lnum . ' with path ' . entry['path'] . " doesn't exist anymore.")
       continue
     endif
 
     " skip this entry if it is not folded (and therefore cannot be opened or closed)
     if entry['foldlevel'] == 0
+      silent! call s:log.trace('tree#restore_folds(): Line ' . lnum . ' with path ' . entry['path'] . ' has foldlevel 0. Ignoring it.')
       continue
     endif
 
@@ -318,8 +336,10 @@ function! tree#restore_folds() abort
     "        Alternatively open everything before and only close what has
     "        to be closed.
     if entry['folded'] == 0
+      silent! call s:log.trace('tree#restore_folds(): Line ' . lnum . ' with path ' . entry['path'] . ' is open.')
       normal! zo
     else
+      silent! call s:log.trace('tree#restore_folds(): Line ' . lnum . ' with path ' . entry['path'] . ' is closed.')
       normal zc
     endif
   endfor
