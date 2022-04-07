@@ -158,6 +158,9 @@ function! tree#get_prefix_and_path(lnum, only_dirs) abort
   endif
 
   let match = matchlist(line, s:prefix_and_path)
+  if match ==# []
+    return []
+  endif
 
   " now normalize the path
   let path = match[3]
