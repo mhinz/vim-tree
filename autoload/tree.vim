@@ -395,12 +395,12 @@ function! s:search_path(filename, full_path) abort
   endwhile
 endfunction
 
-function! tree#get_foldlevel(lnum)
+function! tree#get_foldlevel(lnum) abort
   let line = getline(a:lnum)
   return (strwidth(matchstr(line, s:entry_start_regex_fold)) / 4)
 endfunction
 
-function! tree#open_term()
+function! tree#open_term() abort
   split
   execute 'lcd' tree#GetPath()
   if has('nvim')
