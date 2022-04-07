@@ -9,6 +9,7 @@ let s:prefix_and_path .= '\(\[\s*[0-9]\+\%(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?'
 let s:prefix_and_path .= '\s\+\(.*\)'
 let s:prefix_and_path_cache = {}
 let s:path_cache = {}
+let s:prev_paths = []
 
 if !exists('g:tree_remember_fold_state')
   let g:tree_remember_fold_state = 1
@@ -54,7 +55,7 @@ function! tree#Tree(options) abort
     endif
   augroup END
   set foldexpr=tree#get_foldlevel(v:lnum)
-  echo '(q)uit l(c)d (e)dit (s)plit (v)split (t)abedit help(?)'
+  echo '(q)uit l(c)d lcd..(H) (b)ack (e)dit (s)plit (v)split (t)abedit (r)eload terminal(x) help(?)'
   highlight default link TreeDirectory Directory
   highlight default link TreeSize      SpecialKey
   highlight default link TreeBars      NonText
@@ -79,6 +80,7 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
   nnoremap <silent><buffer><nowait> c :call tree#cd_to()<cr>
   nnoremap <silent><buffer><nowait> H :call tree#cd_up()<cr>
+  nnoremap <silent><buffer><nowait> b :call tree#cd_back()<cr>
   nnoremap <silent><buffer><nowait> e :execute 'edit'             tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> s :execute 'split'            tree#GetPath()<cr>
@@ -413,6 +415,7 @@ endfunction
 function! tree#cd_to() abort
   let path = tree#GetPath()
   if path !=# ''
+    call add(s:prev_paths, getcwd())
     :execute 'lcd' path
   endif
 endfunction
@@ -420,6 +423,20 @@ endfunction
 function! tree#cd_up() abort
   let s:scroll_to_path = fnamemodify(getcwd(), ':t') . '/'
   lcd ..
+endfunction
+
+function! tree#cd_back() abort
+  if !exists('s:prev_paths') || s:prev_paths ==# []
+    return
+  endif
+
+  let path = remove(s:prev_paths, -1)
+  if path ==# ''
+    silent! call s:log.warn('tree#cd_back(): Empty path in s:prev_path. That should not happen')
+  else
+    let s:scroll_to_path = fnamemodify(getcwd(), ':t') . '/'
+    :execute 'lcd' path
+  endif
 endfunction
 
 function! tree#Help() abort
@@ -432,6 +449,7 @@ function! tree#Help() abort
   echo ' r   reload tree with the same options'
   echo ' c   :lcd into current entry and rerun :Tree with the same options'
   echo ' H   :lcd into the parent directory and rerun :Tree with the same options'
+  echo ' b   :lcd back into the previous directory and rerun :Tree with the same options'
   echo ' e   :edit current entry'
   echo ' p   :edit current entry in previous (last accessed) window'
   echo ' s   :split current entry'
