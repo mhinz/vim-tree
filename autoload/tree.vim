@@ -65,13 +65,19 @@ function! tree#Tree(options) abort
 
   let s:prefix_and_path_cache = {}
   let s:path_cache = {}
+
+  if exists('s:scroll_to_path') && s:scroll_to_path !=# ''
+    let scroll_to = s:search_path(s:scroll_to_path, s:scroll_to_path)
+    call cursor(scroll_to, 1)
+    unlet s:scroll_to_path
+  endif
 endfunction
 
 function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
   nnoremap <silent><buffer><nowait> c :execute 'lcd'              tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> H :lcd ..<cr>
+  nnoremap <silent><buffer><nowait> H :call tree#cd_up()<cr>
   nnoremap <silent><buffer><nowait> e :execute 'edit'             tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> s :execute 'split'            tree#GetPath()<cr>
@@ -398,6 +404,11 @@ function! tree#open_term()
   else
     terminal ++curwin
   endif
+endfunction
+
+function! tree#cd_up() abort
+  let s:scroll_to_path = fnamemodify(getcwd(), ':t') . '/'
+  lcd ..
 endfunction
 
 function! tree#Help() abort
