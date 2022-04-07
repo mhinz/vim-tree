@@ -76,7 +76,7 @@ endfunction
 function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
-  nnoremap <silent><buffer><nowait> c :execute 'lcd'              tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> c :call tree#cd_to()<cr>
   nnoremap <silent><buffer><nowait> H :call tree#cd_up()<cr>
   nnoremap <silent><buffer><nowait> e :execute 'edit'             tree#GetPath()<cr>
   nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
@@ -406,6 +406,13 @@ function! tree#open_term()
     terminal
   else
     terminal ++curwin
+  endif
+endfunction
+
+function! tree#cd_to() abort
+  let path = tree#GetPath()
+  if path !=# ''
+    :execute 'lcd' path
   endif
 endfunction
 
