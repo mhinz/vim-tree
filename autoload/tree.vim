@@ -212,10 +212,19 @@ endfunction
 function! tree#reload() abort
   let s:saved_pos = getcurpos()
   let s:saved_entry = tree#GetPath()
+  let start=reltime()
   call tree#save_folds()
+  let save_duration = reltimestr(reltime(start))
+  let start=reltime()
   call tree#Tree(s:last_options)
+  let tree_duration = reltimestr(reltime(start))
   normal! zR
+  let start=reltime()
   call tree#restore_folds()
+  let restore_duration = reltimestr(reltime(start))
+  echom "SAVE    dauerte: " . save_duration
+  echom "TREE    dauerte: " . tree_duration
+  echom "RESTORE dauerte: " . restore_duration
 endfunction
 
 function! s:on_cursormoved() abort
