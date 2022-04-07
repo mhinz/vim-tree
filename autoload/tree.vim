@@ -69,6 +69,7 @@ function! tree#Tree(options) abort
   if exists('s:scroll_to_path') && s:scroll_to_path !=# ''
     let scroll_to = s:search_path(s:scroll_to_path, s:scroll_to_path)
     call cursor(scroll_to, 1)
+    normal! zv
     unlet s:scroll_to_path
   endif
 endfunction
