@@ -55,9 +55,14 @@ let b:prefix_and_path_cache = {}
 let b:path_cache = {}
 
 setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0 foldtext=foldtext#foldtext()
-set foldexpr=tree#get_foldlevel(v:lnum)
 call s:set_mappings()
-call foldtext#set_fold_mappings()
+
+if get(g:, 'tree_enable_folding', '0')
+  setlocal foldlevel=1
+  setlocal foldmethod=expr
+  setlocal foldexpr=tree#get_foldlevel(v:lnum)
+  call foldtext#set_fold_mappings()
+endif
 
 augroup tree
   autocmd! * <buffer>
