@@ -47,7 +47,7 @@ call s:set_mappings()
 call foldtext#set_fold_mappings()
 
 augroup tree
-  autocmd!
+  autocmd! * <buffer>
   autocmd CursorMoved <buffer> call s:on_cursormoved()
   if exists('##DirChanged')
     autocmd DirChanged <buffer> call tree#Tree(b:last_options)
