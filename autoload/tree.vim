@@ -51,7 +51,9 @@ function! tree#Tree(options) abort
   let b:path_cache = {}
 
   if exists('b:scroll_to_path') && b:scroll_to_path !=# ''
-    let scroll_to = s:search_path(b:scroll_to_path, b:scroll_to_path)
+    let relative_path = substitute(b:scroll_to_path, '^'.getcwd().'/', '', '') . '/'
+    let dirname = fnamemodify(b:scroll_to_path, ':t').'/'
+    let scroll_to = s:search_path(dirname, relative_path)
     call cursor(scroll_to, 1)
     normal! zv
     unlet b:scroll_to_path
@@ -375,7 +377,7 @@ function! tree#cd_to() abort
 endfunction
 
 function! tree#cd_up() abort
-  let b:scroll_to_path = fnamemodify(getcwd(), ':t') . '/'
+  let b:scroll_to_path = getcwd()
   lcd ..
 endfunction
 
@@ -388,7 +390,7 @@ function! tree#cd_back() abort
   if path ==# ''
     silent! call s:log.warn('tree#cd_back(): Empty path in b:prev_path. That should not happen')
   else
-    let b:scroll_to_path = fnamemodify(getcwd(), ':t') . '/'
+    let b:scroll_to_path = getcwd()
     :execute 'lcd' path
   endif
 endfunction
