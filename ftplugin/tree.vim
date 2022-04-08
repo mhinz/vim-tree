@@ -6,6 +6,11 @@ let b:did_ftplugin = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+" prepare logging with https://github.com/hupfdule/log.vim (if available)
+silent! let s:log = log#getLogger(expand('<sfile>:t') . ':b'.bufnr().':w'.winnr())
+
+silent! call s:log.info("New tree for directory " . getcwd())
+
 function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
   nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
@@ -26,6 +31,7 @@ function! s:set_mappings() abort
 endfunction
 
 function! s:on_cursormoved() abort
+  silent! call s:log.trace("s:on_cursormoved()")
   normal! 0
   if line('.') <= 1 && line('$') > 1 | 2 | endif
   let ln= search(g:tree#entry_start_regex.'\zs', '', line('.'))
@@ -37,7 +43,9 @@ function! s:on_cursormoved() abort
 endfunction
 
 function! s:on_dirchanged() abort
+  silent! call s:log.trace("s:on_dirchanged()")
   if !v:event['changed_window']
+    silent! call s:log.debug("s:on_dirchanged(): reloading tree for directory ".v:event['cwd'])
     call tree#Tree(b:last_options)
   endif
 endfunction
