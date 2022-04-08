@@ -36,6 +36,11 @@ function! s:on_cursormoved() abort
   endif
 endfunction
 
+function! s:on_dirchanged() abort
+  if !v:event['changed_window']
+    call tree#Tree(b:last_options)
+  endif
+endfunction
 
 let b:prev_paths = []
 let b:prefix_and_path_cache = {}
@@ -50,7 +55,7 @@ augroup tree
   autocmd! * <buffer>
   autocmd CursorMoved <buffer> call s:on_cursormoved()
   if exists('##DirChanged')
-    autocmd DirChanged <buffer> call tree#Tree(b:last_options)
+    autocmd DirChanged <buffer> call s:on_dirchanged()
   endif
 augroup END
 
