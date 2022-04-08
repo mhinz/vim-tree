@@ -54,7 +54,9 @@ function! tree#Tree(options) abort
     let relative_path = substitute(b:scroll_to_path, '^'.getcwd().'/', '', '') . '/'
     let dirname = fnamemodify(b:scroll_to_path, ':t').'/'
     let scroll_to = s:search_path(dirname, relative_path)
-    call cursor(scroll_to, 1)
+    if scroll_to != -1
+      call cursor(scroll_to, 1)
+    endif
     normal! zv
     unlet b:scroll_to_path
   endif
