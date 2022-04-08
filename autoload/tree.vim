@@ -400,6 +400,44 @@ function! tree#cd_back() abort
   endif
 endfunction
 
+function! tree#splitAt(split_cmd) abort
+  let path = tree#GetPath()
+  let options = b:last_options
+  execute a:split_cmd
+  execute 'lcd' path
+  call tree#Tree(options)
+endfunction
+
+function! tree#edit_entry(mode) abort
+  let isdir = getline('.')[-1:] ==# '/'
+
+  if a:mode ==# 'v'
+    if isdir
+      call tree#splitAt('vnew')
+    else
+      execute 'vsplit' tree#GetPath()
+    endif
+  elseif a:mode ==# 's'
+    if isdir
+      call tree#splitAt('new')
+    else
+      execute 'split' tree#GetPath()
+    endif
+  elseif a:mode ==# 't'
+    if isdir
+      call tree#splitAt('tabnew')
+    else
+      execute 'tabedit' tree#GetPath()
+    endif
+  else
+    if isdir
+      execute 'edit' tree#GetPath()
+    else
+      execute 'edit' tree#GetPath()
+    endif
+  endif
+endfunction
+
 function! tree#Help() abort
   echo ' ?   this help'
   echo ' q   wipeout tree buffer'

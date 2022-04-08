@@ -17,11 +17,11 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> c :call tree#cd_to()<cr>
   nnoremap <silent><buffer><nowait> H :call tree#cd_up()<cr>
   nnoremap <silent><buffer><nowait> b :call tree#cd_back()<cr>
-  nnoremap <silent><buffer><nowait> e :execute 'edit'             tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> e :call tree#edit_entry('e')<cr>
   nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> s :execute 'split'            tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> v :execute 'vsplit'           tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> t :execute 'tabedit'          tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> s :call tree#edit_entry('s')<cr>
+  nnoremap <silent><buffer><nowait> v :call tree#edit_entry('v')<cr>
+  nnoremap <silent><buffer><nowait> t :call tree#edit_entry('t')<cr>
   nnoremap <silent><buffer><nowait> r :call tree#reload()<cr>
   nnoremap <silent><buffer><nowait> h :call tree#go_back()<cr>
   nnoremap <silent><buffer><nowait> l :call tree#go_forth()<cr>
