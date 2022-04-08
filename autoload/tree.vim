@@ -1,6 +1,9 @@
 scriptencoding utf-8
 let s:default_cmd = has('win32') ? 'tree.exe' : 'tree'
-let s:default_options = '-n -F --dirsfirst --noreport'
+let s:mandatory_options = '-n -F '
+if !exists('g:tree_default_options')
+  let g:tree_default_options = '--dirsfirst --noreport'
+endif
 let tree#entry_start_regex = '^[│─├└ ␣]\+\(\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?\s\+'
 let s:entry_start_regex_fold = '^\([ │─├└`|-]\{4}\)\+'
 let s:prefix_and_path =  '^\([│─├└ ␣]\+\)'
@@ -17,7 +20,7 @@ silent! let s:log = log#getLogger(expand('<sfile>:t'))
 
 function! tree#Tree(options) abort
   let cmd = printf('%s %s %s %s',
-        \ s:default_cmd, s:default_options, a:options, shellescape(getcwd()))
+        \ s:default_cmd, s:mandatory_options . g:tree_default_options, a:options, shellescape(getcwd()))
   if !&hidden && &modified
     echohl WarningMsg | echo 'There are unsaved changes.' | echohl NONE
     return
