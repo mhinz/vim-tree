@@ -43,8 +43,8 @@ function! s:on_cursormoved() abort
 endfunction
 
 function! s:on_dirchanged() abort
-  silent! call s:log.trace("s:on_dirchanged()")
-  if !v:event['changed_window']
+  silent! call s:log.trace("s:on_dirchanged(): v:event = ". string(v:event))
+  if !has("nvim") || !v:event['changed_window']
     silent! call s:log.debug("s:on_dirchanged(): reloading tree for directory ".v:event['cwd'])
     call tree#Tree(b:last_options)
   endif
