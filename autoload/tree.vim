@@ -364,6 +364,9 @@ endfunction
 
 function! tree#open_term() abort
   let path = tree#GetPath()
+  if path[-1] !=# '/'
+    let path = fnamemodify(path, ':h')
+  endif
   new
   execute 'lcd' path
   if has('nvim')
