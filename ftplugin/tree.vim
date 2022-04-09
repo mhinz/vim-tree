@@ -28,6 +28,7 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> K :call tree#go_up()<cr>
   nnoremap <silent><buffer><nowait> J :call tree#go_down()<cr>
   nnoremap <silent><buffer><nowait> x :call tree#open_term()<cr>
+  nnoremap <silent><buffer><nowait> n :call <SID>search_again()<cr>
 endfunction
 
 function! s:on_cursormoved() abort
@@ -47,6 +48,28 @@ function! s:on_dirchanged() abort
   if !has("nvim") || !v:event['changed_window']
     silent! call s:log.debug("s:on_dirchanged(): reloading tree for directory ".v:event['cwd'])
     call tree#Tree(b:last_options)
+  endif
+endfunction
+
+function! s:search_again() abort
+  let line = line('.')
+  try
+    execute 'normal! n'
+  catch /^Vim\%((\a\+)\)\=:E486:/
+    let errormsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+    echohl ErrorMsg | echo errormsg | echohl Normal
+    return
+  endtry
+
+  " if a search was found on the same line, search again from the next line
+  if line('.') ==# line
+    try
+      execute 'normal! n'
+    catch /^Vim\%((\a\+)\)\=:E486:/
+      let errormsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+      echohl ErrorMsg | echo errormsg | echohl Normal
+      return
+    endtry
   endif
 endfunction
 
