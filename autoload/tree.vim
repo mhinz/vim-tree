@@ -95,8 +95,8 @@ function! tree#go_back() abort
   while line > 1
     let c = strwidth(matchstr(getline(line), g:tree#entry_start_regex))
     if c < col
-      execute line
-      silent! normal! zc
+      execute line + 1
+      silent! normal! zck
       return 1
     endif
     let line -= 1
