@@ -378,6 +378,9 @@ endfunction
 
 function! tree#cd_to() abort
   let path = tree#GetPath()
+  if path[-1] !=# '/'
+    let path = fnamemodify(path, ':h')
+  endif
   if path !=# ''
     call add(b:prev_paths, getcwd())
     :execute 'lcd' path
