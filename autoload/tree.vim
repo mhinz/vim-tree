@@ -383,7 +383,7 @@ function! tree#cd_to() abort
   endif
   if path !=# ''
     call add(b:prev_paths, getcwd())
-    :execute 'lcd' path
+    execute 'lcd' path
   endif
 endfunction
 
