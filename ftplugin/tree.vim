@@ -77,7 +77,7 @@ let b:prev_paths = []
 let b:prefix_and_path_cache = {}
 let b:path_cache = {}
 
-setlocal nomodified buftype=nofile bufhidden=wipe nowrap nonumber foldcolumn=0 foldtext=foldtext#foldtext()
+setlocal nomodified buftype=nofile bufhidden=hide nowrap nonumber foldcolumn=0 foldtext=foldtext#foldtext()
 call s:set_mappings()
 
 if get(g:, 'tree_enable_folding', '0')
