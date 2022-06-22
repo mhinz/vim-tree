@@ -12,23 +12,23 @@ silent! let s:log = log#getLogger(expand('<sfile>:t') . ':b'.bufnr().':w'.winnr(
 silent! call s:log.info("New tree for directory " . getcwd())
 
 function! s:set_mappings() abort
-  nnoremap <silent><buffer><nowait> ? :call tree#Help()<cr>
-  nnoremap <silent><buffer><nowait> q :bwipeout \| echo<cr>
-  nnoremap <silent><buffer><nowait> c :call tree#cd_to()<cr>
-  nnoremap <silent><buffer><nowait> H :call tree#cd_up()<cr>
-  nnoremap <silent><buffer><nowait> b :call tree#cd_back()<cr>
-  nnoremap <silent><buffer><nowait> e :call tree#edit_entry('e')<cr>
-  nnoremap <silent><buffer><nowait> p :execute 'wincmd p \| edit' tree#GetPath()<cr>
-  nnoremap <silent><buffer><nowait> s :call tree#edit_entry('s')<cr>
-  nnoremap <silent><buffer><nowait> v :call tree#edit_entry('v')<cr>
-  nnoremap <silent><buffer><nowait> t :call tree#edit_entry('t')<cr>
-  nnoremap <silent><buffer><nowait> r :call tree#reload()<cr>
-  nnoremap <silent><buffer><nowait> h :call tree#go_back()<cr>
-  nnoremap <silent><buffer><nowait> l :call tree#go_forth()<cr>
-  nnoremap <silent><buffer><nowait> K :call tree#go_up()<cr>
-  nnoremap <silent><buffer><nowait> J :call tree#go_down()<cr>
-  nnoremap <silent><buffer><nowait> x :call tree#open_term()<cr>
-  nnoremap <silent><buffer><nowait> n :call <SID>search_again()<cr>
+  nnoremap <silent><buffer><nowait> ?     :call tree#Help()<cr>
+  nnoremap <silent><buffer><nowait> q     :bwipeout \| echo<cr>
+  nnoremap <silent><buffer><nowait> c     :call tree#cd_to()<cr>
+  nnoremap <silent><buffer><nowait> H     :call tree#cd_up()<cr>
+  nnoremap <silent><buffer><nowait> b     :call tree#cd_back()<cr>
+  nnoremap <silent><buffer><nowait> e     :call tree#edit_entry('e')<cr>
+  nnoremap <silent><buffer><nowait> p     :execute 'wincmd p \| edit' tree#GetPath()<cr>
+  nnoremap <silent><buffer><nowait> s     :call tree#edit_entry('s')<cr>
+  nnoremap <silent><buffer><nowait> v     :call tree#edit_entry('v')<cr>
+  nnoremap <silent><buffer><nowait> t     :call tree#edit_entry('t')<cr>
+  nnoremap <silent><buffer><nowait> r     :call tree#reload()<cr>
+  nnoremap <silent><buffer><nowait> h     :call tree#go_back()<cr>
+  nnoremap <silent><buffer><nowait> l     :call tree#go_forth()<cr>
+  nnoremap <silent><buffer><nowait> <C-K> :call tree#go_up()<cr>
+  nnoremap <silent><buffer><nowait> <C-J> :call tree#go_down()<cr>
+  nnoremap <silent><buffer><nowait> x     :call tree#open_term()<cr>
+  nnoremap <silent><buffer><nowait> n     :call <SID>search_again()<cr>
 endfunction
 
 function! s:on_cursormoved() abort

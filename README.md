@@ -45,6 +45,8 @@ The following changes are made to upstream:
 - Allow tree buffers to be hidden (and reused later on)
 - Introduce a workaround for repeating the search. It didn't proceed if a
   search was found on the current line.
+- Change default mappings for up/down navigation from `J` and `K` to `<C-J>`
+  and `<C-K>`.
 
 ## Installation
 
