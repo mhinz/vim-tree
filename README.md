@@ -47,6 +47,8 @@ The following changes are made to upstream:
   search was found on the current line.
 - Change default mappings for up/down navigation from `J` and `K` to `<C-J>`
   and `<C-K>`.
+- Provide mappings to call 'du' on directory entries to calculate their sizes
+  after the tree was already rendered (calling tree with option '--du' is an alternative to it)
 
 ## Installation
 

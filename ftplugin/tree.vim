@@ -29,6 +29,9 @@ function! s:set_mappings() abort
   nnoremap <silent><buffer><nowait> <C-J> :call tree#go_down()<cr>
   nnoremap <silent><buffer><nowait> x     :call tree#open_term()<cr>
   nnoremap <silent><buffer><nowait> n     :call <SID>search_again()<cr>
+  nnoremap <silent><buffer><nowait> du    :call tree#calc_dir_sizes()<cr>
+  nnoremap <silent><buffer><nowait> dU    :%call tree#calc_dir_sizes()<cr>
+  xnoremap <silent><buffer><nowait> du    :call tree#calc_dir_sizes()<cr>
 endfunction
 
 function! s:on_cursormoved() abort

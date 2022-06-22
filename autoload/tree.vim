@@ -4,10 +4,10 @@ let s:mandatory_options = '-n -F '
 if !exists('g:tree_default_options')
   let g:tree_default_options = '--dirsfirst --noreport'
 endif
-let tree#entry_start_regex = '^[│─├└ ␣]\+\(\[\s*[0-9]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?\s\+'
+let tree#entry_start_regex = '^[│─├└ ␣]\+\(\[\s*[0-9?]\+\(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?\s\+'
 let s:entry_start_regex_fold = '^\([ │─├└`|-]\{4}\)\+'
 let s:prefix_and_path =  '^\([│─├└ ␣]\+\)'
-let s:prefix_and_path .= '\(\[\s*[0-9]\+\%(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?'
+let s:prefix_and_path .= '\(\[\s*[0-9?]\+\%(\.[0-9]\+\)\?[KMGTPE]\?\]\)\?'
 let s:prefix_and_path .= '\s\+\(.*\)'
 
 if !exists('g:tree_remember_fold_state')
@@ -29,6 +29,10 @@ function! tree#Tree(options) abort
     " Only open a new buffer if the current one is not a tree buffer
     enew
   endif
+
+  " Cancel all running background processes ('du')
+  call jobs#cancel_all()
+
   let &l:statusline = ' '.cmd
   execute 'silent %!'.cmd
   if v:shell_error || getline(1) =~# '\V [error opening dir]'
@@ -444,6 +448,60 @@ function! tree#edit_entry(mode) abort
   endif
 endfunction
 
+function! s:calc_dir_size_at(lnums) abort
+  let paths = []
+  for lnum in a:lnums
+    " only process directories
+    let line = getline(lnum)
+    if line[-1:] ==# '/'
+      let path = tree#GetPathAt(lnum)
+      let matchlist= matchlist(line, s:prefix_and_path)
+      " Replace the size in each value with question marks to indicate the
+      " running 'du'
+      let size = '[  ??]  '
+      if matchlist[2] ==# ''
+        let size = ' ' . size
+      endif
+      call setline(lnum, matchlist[1] . size . matchlist[3])
+      let paths = add(paths, path)
+    endif
+  endfor
+
+  call jobs#start_get_dir_size(paths, function('s:tree_du_callback'))
+endfunction
+
+function! tree#calc_dir_sizes() range abort
+  let lnums = []
+  for lnum in range(a:firstline, a:lastline)
+    let line = getline(lnum)
+    if line[-1:] ==# '/'
+      let lnums = add(lnums, lnum)
+    endif
+  endfor
+  call s:calc_dir_size_at(lnums)
+endfunction
+
+function! s:tree_du_callback(dir, size) abort
+  echom a:dir . ' ' . a:size
+  let dirname = fnamemodify(a:dir[:-2], ':t').'/'
+  let cur_pos = getpos('.')
+  let lnum = s:search_path(dirname, a:dir)
+  call setpos('.', cur_pos)
+  let matchlist= matchlist(getline(lnum), s:prefix_and_path)
+  if matchlist !=# []
+    " replace the size of the dir with the size calculated by 'du'
+    let size = '[' . s:left_pad(a:size, 4) . ']  '
+    if matchlist[2] ==# ''
+      let size = ' ' . size
+    endif
+    call setline(lnum, matchlist[1] . size . matchlist[3])
+  endif
+endfunction
+
+function! s:left_pad(str, width)
+  return repeat(' ', a:width - len(a:str)) . a:str
+endfunction
+
 function! tree#Help() abort
   echo ' ?       this help'
   echo ' q       wipeout tree buffer'
@@ -461,4 +519,6 @@ function! tree#Help() abort
   echo ' v       :vsplit current entry'
   echo ' t       :tabedit current entry'
   echo ' x       :terminal on current entry'
+  echo ' du      call "du" (either for visual selection or current line)'
+  echo ' dU      call "du" for the whole buffer'
 endfunction
