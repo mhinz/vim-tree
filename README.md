@@ -37,7 +37,7 @@ The following changes are made to upstream:
   (defaults to `--dirsfirst --noreport`). The options `-n -F` are always
   set regardless of this new option as they are needed for vim-tree to work
   correctly.
-- Change mappings `s`, `v`, `t` to differntiate between files and
+- Change mappings `s`, `v`, `t` to differentiate between files and
   directories. For directories they now open a new tree of the selected entry in
   the corresponding window/tab instead of netrw.
 - Change mapping `e` to open netrw for the selected entry in a vertical
