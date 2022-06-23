@@ -99,7 +99,7 @@ function! s:call_du(dirs, callback, timer_id) abort
   let l:stdout= systemlist(['/usr/bin/du', '-sh', a:dirs[0]])
   let &shellredir = l:shellredir
   let l:dir_and_size = s:process_du_stdout(l:stdout)
-  let l:size= substitute(l:dir_and_size[0], ',', '.', '')  " naiive way to avoid locale differences for thousands separator
+  let l:size= substitute(l:dir_and_size[0], ',', '.', '')  " naïve way to avoid locale differences for thousands separator
   let l:dir = l:dir_and_size[1]
   silent! call s:log.trace("Result of 'du' for " . a:dirs[0] . ": " . l:size . ' ' . l:dir)
 
