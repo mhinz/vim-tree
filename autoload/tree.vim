@@ -118,7 +118,11 @@ function! tree#go_forth() abort
     endif
     if c > col
       execute line
-      silent! normal! zo
+      if get(g:, 'tree_enable_folding', '0')
+        silent! normal  zo
+      else
+        silent! normal! zo
+      endif
       return 1
     endif
     let line += 1
