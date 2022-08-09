@@ -212,7 +212,7 @@ endfunction
 function! tree#reload() abort
   let b:saved_pos = getcurpos()
   let b:saved_entry = tree#GetPath()
-  let winline = winline()
+  let l:view = winsaveview()
 
   if g:tree_remember_fold_state
     echohl MoreMsg | echo "Remembering all folds for later restore (avoid by setting g:tree_remember_fold_state = 0)" | echohl None
@@ -237,13 +237,7 @@ function! tree#reload() abort
   endif
 
   " Restore scroll position in case it has changed after reload
-  let winline2 = winline()
-  let scrolldiff = winline - winline2
-  if scrolldiff > 0
-    execute "normal! ".scrolldiff."\<C-Y>"
-  elseif scrolldiff < 0
-    execute "normal! ".abs(scrolldiff)."\<C-E>"
-  endif
+  call winrestview(l:view)
 endfunction
 
 function! tree#save_folds() abort
